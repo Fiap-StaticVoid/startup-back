@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "startup-back"
+version = "0.1.0"
+description = ""
+authors = ["Matheus Mendes <mattheus2015@yahoo.com.br>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.110.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+gunicorn = "^21.2.0"
+SQLAlchemy = {extras = ["asyncio"], version = "^2.0.29"}
+asyncpg = "^0.29.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+mypy = "^1.9.0"
+bandit = "^1.7.8"
+isort = "^5.13.2"
+ruff = "^0.3.4"
+pre-commit = "^3.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
