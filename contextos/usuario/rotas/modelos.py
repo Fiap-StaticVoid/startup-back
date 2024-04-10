@@ -1,6 +1,12 @@
+from enum import StrEnum
 from uuid import UUID
 
 from pydantic import BaseModel
+
+
+class TipoToken(StrEnum):
+    bearer = "bearer"
+    jwt = "jwt"
 
 
 class DadosLogin(BaseModel):
@@ -20,3 +26,4 @@ class UsuarioSaida(BaseModel):
 
 class TokenSaida(BaseModel):
     token: str
+    tipo: TipoToken

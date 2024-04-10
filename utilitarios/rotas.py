@@ -19,9 +19,12 @@ class DadosSessao:
 
 def pegar_token_dos_headers(request: Request) -> str:
     try:
-        return request.headers.get("Authorization").split(" ")[1]
-    except (AttributeError, IndexError) as e:
-        raise HTTPException(status_code=401, detail="Token não fornecido") from e
+        tipo, token = request.headers.get("Authorization").split(" ")
+    except (ValueError, AttributeError) as e:
+        raise HTTPException(status_code=401, detail="Token inválido") from e
+    if tipo.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Token inválido")
+    return token
 
 
 async def pegar_sessao(request: Request) -> AsyncGenerator[DadosSessao, None]:
