@@ -1,13 +1,18 @@
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
+from contextos.usuario.repositorios.escrita import RepoEscritaUsuario
+from contextos.usuario.repositorios.leitura import RepoLeituraUsuario
 from contextos.usuario.rotas.modelos import (
     DadosLogin,
+    TipoToken,
     TokenSaida,
     UsuarioEntrada,
+    UsuarioEntradaAtualizar,
     UsuarioSaida,
 )
+from contextos.usuario.tabela import Usuario
 from utilitarios.rotas import SessaoUsuario
 
 rotas = APIRouter(
@@ -19,31 +24,56 @@ rotas = APIRouter(
 
 @rotas.post("/login", response_model=TokenSaida, status_code=200)
 async def login(dados: DadosLogin):
-    pass
+    async with RepoLeituraUsuario() as repo:
+        usuario = await repo.buscar_por_email(dados.email)
+        if usuario is None or not usuario.verificar_senha(dados.senha):
+            raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    return TokenSaida(token=usuario.token, tipo=TipoToken.bearer)
 
 
 @rotas.get("/logout", status_code=200)
 async def logout(sessao: SessaoUsuario):
-    pass
+    async with RepoEscritaUsuario().definir_sessao(sessao.sessao, False) as repo:
+        await repo.remover_token(sessao.usuario)
+    return
 
 
-@rotas.post("/", response_model=UsuarioSaida, status_code=201)
+@rotas.post("", response_model=UsuarioSaida, status_code=201)
 async def criar_usuario(usuario: UsuarioEntrada):
-    pass
+    usuario = Usuario(**usuario.model_dump())
+    async with RepoEscritaUsuario() as repo:
+        await repo.adicionar(usuario)
+    return UsuarioSaida(**usuario.model_dump())
 
 
 @rotas.get("/{usuario_id}", response_model=UsuarioSaida, status_code=200)
 async def ler_usuario(usuario_id: UUID, sessao: SessaoUsuario):
-    pass
+    async with RepoLeituraUsuario().definir_sessao(sessao.sessao) as repo:
+        usuario = await repo.buscar_por_id(usuario_id)
+    return UsuarioSaida(**usuario.model_dump())
 
 
 @rotas.patch("/{usuario_id}", response_model=UsuarioSaida, status_code=200)
 async def atualizar_usuario(
-    usuario_id: UUID, usuario: UsuarioEntrada, sessao: SessaoUsuario
+    usuario_id: UUID, usuario: UsuarioEntradaAtualizar, sessao: SessaoUsuario
 ):
-    pass
+    async with RepoLeituraUsuario().definir_sessao(sessao.sessao, True) as repo_leitura:
+        instancia_usuario = await repo_leitura.buscar_por_id(usuario_id)
+    instancia_usuario.nome = usuario.nome
+    instancia_usuario.email = usuario.email
+    if usuario.senha:
+        instancia_usuario.senha = usuario.senha
+    async with RepoEscritaUsuario().definir_sessao(
+        sessao.sessao, False
+    ) as repo_escrita:
+        await repo_escrita.adicionar(instancia_usuario)
+    return UsuarioSaida(**instancia_usuario.model_dump())
 
 
-@rotas.delete("/{usuario_id}", status_code=204)
-async def deletar_usuario(usuario_id: UUID, sessao: SessaoUsuario):
-    pass
+@rotas.delete("/deletar", status_code=204)
+async def deletar_usuario(sessao: SessaoUsuario):
+    async with RepoEscritaUsuario().definir_sessao(
+        sessao.sessao, False
+    ) as repo_escrita:
+        await repo_escrita.remover(sessao.usuario)
+    return

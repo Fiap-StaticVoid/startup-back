@@ -27,3 +27,9 @@ class UsuarioSaida(BaseModel):
 class TokenSaida(BaseModel):
     token: str
     tipo: TipoToken
+
+
+class UsuarioEntradaAtualizar(BaseModel):
+    email: str
+    nome: str
+    senha: str | None = None

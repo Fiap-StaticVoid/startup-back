@@ -34,6 +34,7 @@ async def index():
     return RedirectResponse("/docs")
 
 
-app.include_router(usuario_rotas)
-app.include_router(categoria_rotas)
-app.include_router(historico_rotas)
+api_prefix = "/api"
+app.include_router(usuario_rotas, prefix=api_prefix)
+app.include_router(categoria_rotas, prefix=api_prefix)
+app.include_router(historico_rotas, prefix=api_prefix)

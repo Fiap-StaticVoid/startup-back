@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.sql.schema import Index, UniqueConstraint
 
 from banco.tabelas import TabelaBase
-from utilitarios.senhas import gerar_senha
+from utilitarios.senhas import gerar_senha, verificar_senha
 
 
 class Usuario(TabelaBase):
@@ -27,3 +27,14 @@ class Usuario(TabelaBase):
     @senha.setter
     def senha(self, senha: str) -> None:
         self._senha = gerar_senha(senha)
+
+    def verificar_senha(self, senha: str) -> bool:
+        return verificar_senha(senha, self._senha)
+
+    def model_dump(self) -> dict:
+        return {
+            "id": str(self.id),
+            "nome": self.nome,
+            "email": self.email,
+            "token": self.token,
+        }

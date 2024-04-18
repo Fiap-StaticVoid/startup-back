@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from importlib import import_module
 from pathlib import Path
 
@@ -13,10 +12,8 @@ engine = create_async_engine(
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-@asynccontextmanager
 async def abrir_sessao():
-    async with async_session() as sessao:
-        yield sessao
+    return async_session()
 
 
 def carregar_tabelas():
