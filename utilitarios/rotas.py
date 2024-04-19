@@ -6,7 +6,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import banco
+from banco import abrir_sessao
 from contextos.usuario.repositorios.leitura import RepoLeituraUsuario
 from contextos.usuario.tabela import Usuario
 
@@ -29,7 +29,7 @@ def pegar_token_dos_headers(request: Request) -> str:
 
 async def pegar_sessao(request: Request) -> AsyncGenerator[DadosSessao, None]:
     token = pegar_token_dos_headers(request)
-    async with banco.abrir_sessao() as sessao:
+    async with abrir_sessao() as sessao:
         async with RepoLeituraUsuario().definir_sessao(sessao) as repo:
             usuario = await repo.buscar_por_token(token)
             if usuario is None:

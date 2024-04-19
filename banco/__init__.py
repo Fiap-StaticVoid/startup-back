@@ -1,23 +1,26 @@
+from contextlib import asynccontextmanager
 from importlib import import_module
 from pathlib import Path
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-BASE_DIR = Path(__file__).parent
-engine = create_async_engine(
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres",
-)
+from utilitarios.ambiente import ConfigsAmbiente
+
+env = ConfigsAmbiente()
+engine = create_async_engine(env.PG_URL)
 
 
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
+@asynccontextmanager
 async def abrir_sessao():
-    return async_session()
+    async with async_session() as sessao:
+        yield sessao
 
 
 def carregar_tabelas():
-    for arquivo in (BASE_DIR / "tabelas").glob("*.py"):
+    for arquivo in (Path(__file__).parent / "tabelas").glob("*.py"):
         if arquivo.name != "__init__.py":
             import_module(f"banco.tabelas.{arquivo.stem}")
 

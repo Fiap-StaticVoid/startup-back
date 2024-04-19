@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import banco
+from banco import async_session
 
 T = TypeVar("T")
 
@@ -26,7 +26,8 @@ class RepoBase:
 
     async def __aenter__(self) -> Self:
         if self.sessao is None:
-            self.sessao = banco.async_session()
+            self.sessao = async_session()
+
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback) -> None:
