@@ -9,14 +9,15 @@ class ConfigsAmbiente(BaseSettings):
     PG_USER: str
     PG_PASSWORD: str
     PG_HOST: str
-    PG_PORT: int
+    PG_PORT: int | None = None
     PG_DATABASE: str
     PG_SCHEMA: str
 
     @property
     def PG_URL(self) -> str:
+        port_str = f":{self.PG_PORT}" if self.PG_PORT else ""
         return (
             f"postgresql+{self.ASYNC_PG_ENGINE}://"
             f"{self.PG_USER}:{self.PG_PASSWORD}@"
-            f"{self.PG_HOST}:{self.PG_PORT}/{self.PG_DATABASE}"
+            f"{self.PG_HOST}{port_str}/{self.PG_DATABASE}"
         )

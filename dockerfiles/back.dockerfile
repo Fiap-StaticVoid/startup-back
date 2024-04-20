@@ -2,7 +2,7 @@ FROM python:3.12-alpine
 
 RUN apk update && apk add curl
 ENV POETRY_HOME="/opt/poetry"
-RUN curl -sSL https://install.python-poetry.org | python3 - 
+RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 WORKDIR /app
@@ -12,6 +12,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev --no-interaction --no-ansi
 
 COPY . .
+COPY .container.env .env
 
 EXPOSE 8000
 

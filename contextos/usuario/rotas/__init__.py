@@ -31,7 +31,7 @@ async def login(dados: DadosLogin):
     return TokenSaida(token=usuario.token, tipo=TipoToken.bearer)
 
 
-@rotas.get("/logout", status_code=200)
+@rotas.post("/logout", status_code=200)
 async def logout(sessao: SessaoUsuario):
     async with RepoEscritaUsuario().definir_sessao(sessao.sessao) as repo:
         usuario = await repo.buscar_por_id(sessao.usuario.id)

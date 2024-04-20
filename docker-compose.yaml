@@ -1,11 +1,15 @@
 services:
     app:
+        container_name: app_fastapi
         build:
             context: .
             dockerfile: .\dockerfiles\back.dockerfile
         ports:
             - 8000:8000
+        depends_on:
+            - db
     db:
+        container_name: db_postgres
         image: postgres:16.2-alpine
         environment:
             POSTGRES_USER: postgres
@@ -14,6 +18,7 @@ services:
         ports:
             - 5432:5432
     pgadmin:
+        container_name: pg_admin
         image: dpage/pgadmin4
         depends_on:
             - db

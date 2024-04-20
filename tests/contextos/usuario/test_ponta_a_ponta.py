@@ -62,7 +62,7 @@ async def test_login(cliente: AsyncClient, mock_usuario: Usuario):
 
 async def test_logout(cliente: AsyncClient, mock_usuario: Usuario):
     async with cliente(token="teste") as cliente:
-        resposta = await cliente.get(
+        resposta = await cliente.post(
             "/api/usuarios/logout",
             headers={"Authorization": f"Bearer {mock_usuario.token}"},
         )
