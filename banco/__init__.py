@@ -1,6 +1,4 @@
 from contextlib import asynccontextmanager
-from importlib import import_module
-from pathlib import Path
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
@@ -20,9 +18,9 @@ async def abrir_sessao():
 
 
 def carregar_tabelas():
-    for arquivo in (Path(__file__).parent / "tabelas").glob("*.py"):
-        if arquivo.name != "__init__.py":
-            import_module(f"banco.tabelas.{arquivo.stem}")
+    from contextos.categoria.tabela import Categoria  # noqa: F401
+    from contextos.historico.tabela import Historico  # noqa: F401
+    from contextos.usuario.tabela import Usuario  # noqa: F401
 
 
 async def iniciar_banco():

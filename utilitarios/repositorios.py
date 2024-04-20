@@ -52,5 +52,5 @@ class RepoLeituraBase(Generic[T], RepoBase, ABC):
         pass
 
     @abstractmethod
-    async def buscar_por_id(self, id: UUID) -> T:
+    async def buscar_por_id(self, id: UUID) -> T | None:
         pass

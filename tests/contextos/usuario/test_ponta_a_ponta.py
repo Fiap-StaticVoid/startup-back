@@ -2,7 +2,7 @@ from httpx import AsyncClient
 from pytest import mark
 
 from contextos.usuario.repositorios.leitura import RepoLeituraUsuario
-from contextos.usuario.rotas.modelos import UsuarioEntrada
+from contextos.usuario.rotas.modelos import UsuarioEntrada, UsuarioEntradaAtualizar
 from contextos.usuario.tabela import Usuario
 
 pytestmark = mark.asyncio
@@ -29,10 +29,10 @@ async def test_ler_usuario(cliente: AsyncClient, mock_usuario: Usuario):
 
 
 async def test_atualizar_usuario(cliente: AsyncClient, mock_usuario: Usuario):
-    usuario = UsuarioEntrada(
+    usuario = UsuarioEntradaAtualizar(
         nome="Usuário Teste Atualizado",
         email="teste@teste.com.br",
-        senha="senha",
+        senha=None,
     )
     async with cliente(token="teste") as cliente:
         resposta = await cliente.patch(

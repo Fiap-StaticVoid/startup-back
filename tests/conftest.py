@@ -78,5 +78,9 @@ async def cliente():
     yield wrapper
 
 
+from tests.contextos.categoria.mocks import mock_categoria  # noqa: F401, E402
+from tests.contextos.categoria.mocks import mock_custom_categoria  # noqa: F401, E402
+from tests.contextos.historico.mocks import mock_custom_historico  # noqa: F401, E402
+from tests.contextos.historico.mocks import mock_historico  # noqa: F401, E402
 from tests.contextos.usuario.mocks import mock_custom_usuario  # noqa: F401, E402
 from tests.contextos.usuario.mocks import mock_usuario  # noqa: F401, E402

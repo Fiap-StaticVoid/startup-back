@@ -1,3 +1,6 @@
+from uuid import UUID
+
+from sqlalchemy import select
 from sqlalchemy.sql.expression import delete
 
 from contextos.usuario.tabela import Usuario
@@ -16,3 +19,10 @@ class RepoEscritaUsuario(RepoEscritaBase[Usuario]):
     async def remover_token(self, obj: Usuario) -> None:
         obj.token = None
         await self.sessao.commit()
+
+    async def buscar_por_id(self, id: UUID) -> Usuario | None:
+        return await self.sessao.scalar(
+            select(Usuario).where(
+                Usuario.id == id,
+            )
+        )

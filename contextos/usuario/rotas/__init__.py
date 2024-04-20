@@ -33,8 +33,9 @@ async def login(dados: DadosLogin):
 
 @rotas.get("/logout", status_code=200)
 async def logout(sessao: SessaoUsuario):
-    async with RepoEscritaUsuario().definir_sessao(sessao.sessao, False) as repo:
-        await repo.remover_token(sessao.usuario)
+    async with RepoEscritaUsuario().definir_sessao(sessao.sessao) as repo:
+        usuario = await repo.buscar_por_id(sessao.usuario.id)
+        await repo.remover_token(usuario)  # type: ignore
     return
 
 
@@ -50,7 +51,7 @@ async def criar_usuario(usuario: UsuarioEntrada):
 async def ler_usuario(usuario_id: UUID, sessao: SessaoUsuario):
     async with RepoLeituraUsuario().definir_sessao(sessao.sessao) as repo:
         usuario = await repo.buscar_por_id(usuario_id)
-    return UsuarioSaida(**usuario.model_dump())
+    return UsuarioSaida(**usuario.model_dump())  # type: ignore
 
 
 @rotas.patch("/{usuario_id}", response_model=UsuarioSaida, status_code=200)
@@ -59,21 +60,19 @@ async def atualizar_usuario(
 ):
     async with RepoLeituraUsuario().definir_sessao(sessao.sessao, True) as repo_leitura:
         instancia_usuario = await repo_leitura.buscar_por_id(usuario_id)
+    if instancia_usuario is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
     instancia_usuario.nome = usuario.nome
     instancia_usuario.email = usuario.email
     if usuario.senha:
         instancia_usuario.senha = usuario.senha
-    async with RepoEscritaUsuario().definir_sessao(
-        sessao.sessao, False
-    ) as repo_escrita:
+    async with RepoEscritaUsuario().definir_sessao(sessao.sessao) as repo_escrita:
         await repo_escrita.adicionar(instancia_usuario)
     return UsuarioSaida(**instancia_usuario.model_dump())
 
 
 @rotas.delete("/deletar", status_code=204)
 async def deletar_usuario(sessao: SessaoUsuario):
-    async with RepoEscritaUsuario().definir_sessao(
-        sessao.sessao, False
-    ) as repo_escrita:
+    async with RepoEscritaUsuario().definir_sessao(sessao.sessao) as repo_escrita:
         await repo_escrita.remover(sessao.usuario)
     return

@@ -12,3 +12,10 @@ class Categoria(TabelaBase):
 
     nome: Mapped[str]
     descricao: Mapped[Optional[str]]
+
+    def model_dump(self) -> dict:
+        return {
+            "id": str(self.id),
+            "nome": self.nome,
+            "descricao": self.descricao,
+        }

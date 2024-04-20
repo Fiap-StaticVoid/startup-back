@@ -35,7 +35,7 @@ async def pegar_sessao(request: Request) -> AsyncGenerator[DadosSessao, None]:
             if usuario is None:
                 raise HTTPException(status_code=401, detail="Token inválido")
 
-            yield DadosSessao(sessao=sessao, usuario=usuario)
+        yield DadosSessao(sessao=sessao, usuario=usuario)
 
 
 SessaoUsuario = Annotated[DadosSessao, Depends(pegar_sessao)]
