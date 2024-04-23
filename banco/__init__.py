@@ -24,6 +24,8 @@ def carregar_tabelas():
 
 
 async def iniciar_banco():
+    if env.PG_SCHEMA == "teste":
+        return
     from banco.tabelas import Base
 
     carregar_tabelas()
