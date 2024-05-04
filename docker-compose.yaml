@@ -8,6 +8,7 @@ services:
             - 8000:8000
         depends_on:
             - db
+        command: sh -c "alembic upgrade head && gunicorn servidor.config:app --workers=1 --worker-class=uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --access-logfile=-"
     db:
         container_name: db_postgres
         image: postgres:16.2-alpine
@@ -19,7 +20,7 @@ services:
             - 5432:5432
     pgadmin:
         container_name: pg_admin
-        image: dpage/pgadmin4
+        image: dpage/pgadmin4:latest
         depends_on:
             - db
         environment:

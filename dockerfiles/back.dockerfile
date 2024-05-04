@@ -8,11 +8,10 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 WORKDIR /app
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev --no-interaction --no-ansi
+RUN poetry config virtualenvs.create false && poetry install --no-dev --no-interaction --no-ansi --no-root
 
 COPY . .
-COPY .container.env .env
+RUN mv .container.env .env && mv alembic.container.ini alembic.ini
 
 EXPOSE 8000
 

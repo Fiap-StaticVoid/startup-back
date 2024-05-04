@@ -1,0 +1,16 @@
+.git/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.vscode/
+tests/
+dockerfiles/
+__pycache__/
+.gitignore
+.pre-commit-config.yaml
+.env
+.env.example
+.dockerignore
+alembic.ini
+docker-compose.yaml
+README.md
