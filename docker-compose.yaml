@@ -28,3 +28,18 @@ services:
             PGADMIN_DEFAULT_PASSWORD: admin
         ports:
             - 5050:80
+    redis:
+        container_name: redis
+        image: redis:latest
+        ports:
+            - 6379:6379
+
+    celery:
+        container_name: celery
+        build:
+            context: .
+            dockerfile: .\dockerfiles\celery.dockerfile
+        depends_on:
+            - db
+            - redis
+        command: sh -c "celery -A celery_worker.celery worker --loglevel=info"

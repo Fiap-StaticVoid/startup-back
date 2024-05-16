@@ -22,14 +22,14 @@ def event_loop(request):
 
 @fixture(autouse=True, scope="session")
 async def criar_schema():
-    from banco import async_session, carregar_tabelas, engine
+    from banco import async_engine, async_session, carregar_tabelas
 
     async with async_session() as sessao:
         await sessao.execute(text("DROP SCHEMA IF EXISTS testes CASCADE;"))
         await sessao.execute(text("CREATE SCHEMA IF NOT EXISTS testes;"))
         await sessao.commit()
         carregar_tabelas()
-        async with engine.begin() as conn:
+        async with async_engine.begin() as conn:
             # muda o esquema para testes
             await conn.execute(text("SET search_path TO testes;"))
             await conn.run_sync(Base.metadata.create_all)
@@ -53,10 +53,10 @@ async def mock_sessao(monkeypatch):
 
 @fixture(autouse=True)
 async def limpar_banco():
-    from banco import async_session, engine
+    from banco import async_engine, async_session
 
     async with async_session() as sessao:
-        async with engine.begin() as conn:
+        async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
         yield sessao
