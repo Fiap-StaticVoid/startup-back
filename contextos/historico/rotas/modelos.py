@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -24,7 +25,7 @@ class LancamentoRecorrenteEntrada(BaseModel):
     valor: float
     categoria_id: UUID
     inicia_em: datetime
-    termina_em: datetime
+    termina_em: Optional[datetime]
     frequencia: int
     tipo_frequencia: TipoFrequencia
 
@@ -35,6 +36,6 @@ class LancamentoRecorrenteSaida(BaseModel):
     usuario_id: UUID
     categoria_id: UUID
     inicia_em: datetime
-    termina_em: datetime
+    termina_em: Optional[datetime]
     frequencia: int
     tipo_frequencia: TipoFrequencia
