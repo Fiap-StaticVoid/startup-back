@@ -14,7 +14,7 @@ class RepoEscritaHistorico(RepoEscritaBase[Historico]):
         self.usuario = usuario
 
     def adicionar_sync(self, obj: Historico, commit: bool = True) -> None:
-        self.sessao.add(obj)
+        self.sessao_sync.add(obj)
         if commit:
             self.sessao_sync.commit()
 

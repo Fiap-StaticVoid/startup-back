@@ -6,6 +6,9 @@ from fastapi.responses import RedirectResponse
 
 from contextos.categoria.rotas import rotas as categoria_rotas
 from contextos.historico.rotas import rotas as historico_rotas
+from contextos.historico.rotas.lancamento_recorrente import (
+    rotas as lancamento_recorrente_rotas,
+)
 from contextos.usuario.rotas import rotas as usuario_rotas
 
 
@@ -38,3 +41,4 @@ api_prefix = "/api"
 app.include_router(usuario_rotas, prefix=api_prefix)
 app.include_router(categoria_rotas, prefix=api_prefix)
 app.include_router(historico_rotas, prefix=api_prefix)
+app.include_router(lancamento_recorrente_rotas, prefix=api_prefix)

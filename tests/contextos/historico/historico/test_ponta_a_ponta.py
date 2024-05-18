@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from httpx import AsyncClient
 from pytest import mark
@@ -18,7 +18,7 @@ async def test_criar_historico(
     historico = HistoricoEntrada(
         valor=100.0,
         categoria_id=mock_categoria.id,
-        data=date.today(),
+        data=datetime.now(),
     )
     async with cliente(token=mock_usuario.token) as cliente:
         resposta = await cliente.post(
@@ -40,7 +40,7 @@ async def test_atualizar_historico(cliente: AsyncClient, mock_historico: Histori
     historico = HistoricoEntrada(
         valor=200.0,
         categoria_id=mock_historico.categoria_id,
-        data=date.today(),
+        data=datetime.now(),
     )
     async with cliente(token=mock_historico.usuario.token) as cliente:
         resposta = await cliente.patch(

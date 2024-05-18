@@ -6,17 +6,10 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from banco import carregar_tabelas
-from banco.tabelas import Base
-
-carregar_tabelas()
-
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
@@ -31,6 +24,12 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+    from banco import carregar_tabelas
+
+    carregar_tabelas()
+    from banco.tabelas import Base
+
+    target_metadata = Base.metadata
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -44,6 +43,13 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
+    from banco import carregar_tabelas
+
+    carregar_tabelas()
+    from banco.tabelas import Base
+
+    target_metadata = Base.metadata
+
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():

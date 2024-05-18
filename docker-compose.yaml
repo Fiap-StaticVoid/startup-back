@@ -4,6 +4,7 @@ services:
         build:
             context: .
             dockerfile: .\dockerfiles\back.dockerfile
+            target: back
         ports:
             - 8000:8000
         depends_on:
@@ -34,12 +35,23 @@ services:
         ports:
             - 6379:6379
 
-    celery:
-        container_name: celery
+    celery-worker:
+        container_name: celery-worker
         build:
             context: .
-            dockerfile: .\dockerfiles\celery.dockerfile
+            dockerfile: .\dockerfiles\back.dockerfile
+            target: celery-worker
         depends_on:
             - db
             - redis
-        command: sh -c "celery -A celery_worker.celery worker --loglevel=info"
+
+    celery-beat:
+        container_name: celery-beat
+        build:
+            context: .
+            dockerfile: .\dockerfiles\back.dockerfile
+            target: celery-beat
+        depends_on:
+            - db
+            - redis
+            - celery-worker

@@ -20,29 +20,6 @@ class TipoFrequencia(StrEnum):
     anual = "anual"
 
 
-class Historico(TabelaBase):
-    __tablename__ = "historicos"
-
-    valor: Mapped[float]
-
-    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
-    usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
-
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
-    categoria: Mapped[Categoria] = relationship("Categoria", lazy="subquery")
-
-    data: Mapped[datetime] = mapped_column(default=datetime.now)
-
-    def model_dump(self) -> dict:
-        return {
-            "id": str(self.id),
-            "valor": self.valor,
-            "usuario_id": str(self.usuario_id),
-            "categoria_id": str(self.categoria_id),
-            "data": self.data.strftime("%Y-%m-%d"),
-        }
-
-
 class LancamentoRecorrente(TabelaBase):
     __tablename__ = "lancamentos_recorrentes"
 
@@ -90,4 +67,34 @@ class LancamentoRecorrente(TabelaBase):
             ),
             "frequencia": self.frequencia,
             "tipo_frequencia": self.tipo_frequencia.value,
+        }
+
+
+class Historico(TabelaBase):
+    __tablename__ = "historicos"
+
+    valor: Mapped[float]
+
+    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
+    usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
+
+    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
+    categoria: Mapped[Categoria] = relationship("Categoria", lazy="subquery")
+
+    data: Mapped[datetime] = mapped_column(default=datetime.now)
+
+    lancamento_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("lancamentos_recorrentes.id"), nullable=True
+    )
+    lancamento: Mapped[Optional[LancamentoRecorrente]] = relationship(
+        "LancamentoRecorrente", lazy="subquery"
+    )
+
+    def model_dump(self) -> dict:
+        return {
+            "id": str(self.id),
+            "valor": self.valor,
+            "usuario_id": str(self.usuario_id),
+            "categoria_id": str(self.categoria_id),
+            "data": self.data.strftime("%Y-%m-%d"),
         }

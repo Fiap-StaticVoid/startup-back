@@ -1,13 +1,15 @@
+from datetime import timedelta
+
 from celery import Celery
-from celery.schedules import crontab
 
 celery_app = Celery("server", broker="redis://redis:6379/0")
+
 
 celery_app.conf.beat_schedule = {
     "rodar-lancamentos-recorrentes": {
         "task": "contextos.historico.executores.tarefas.rodar_lancamentos_recorrentes",
-        "schedule": crontab(minute=1),
+        "schedule": timedelta(seconds=60),
         "args": (),
     },
 }
-celery_app.conf.timezone = "UTC"
+celery_app.conf.timezone = "America/Sao_Paulo"

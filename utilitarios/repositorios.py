@@ -17,6 +17,7 @@ class RepoBase:
 
     def __init__(self) -> None:
         self.sessao = None
+        self.sessao_sync = None
         self.manter_sessao_aberta = False
 
     def definir_sessao(

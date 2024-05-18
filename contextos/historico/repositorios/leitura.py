@@ -32,20 +32,9 @@ class RepoLeituraHistorico(RepoLeituraBase[Historico]):
             )
         )
 
-    def buscar_exato_crawler(
-        self,
-        valor: float,
-        usuario_id: int,
-        categoria_id: int,
-        data: datetime,
-    ) -> list[Historico]:
+    def buscar_historicos_do_lancamento(self, lancamento_id: UUID) -> list[Historico]:
         return self.sessao_sync.scalars(
-            select(Historico)
-            .where(Historico.valor == valor)
-            .where(Historico.usuario_id == usuario_id)
-            .where(Historico.categoria_id == categoria_id)
-            .where(Historico.data == data)
-            .order_by(Historico.data)
+            select(Historico).where(Historico.lancamento_id == lancamento_id)
         )
 
 
@@ -71,7 +60,7 @@ class RepoLeituraLancamentoRecorrente(RepoLeituraBase[LancamentoRecorrente]):
             .order_by(LancamentoRecorrente.inicia_em)
         )
 
-    async def buscar_por_id(self, id: UUID) -> Historico | None:
+    async def buscar_por_id(self, id: UUID) -> LancamentoRecorrente | None:
         if not self.usuario:
             return None
         return await self.sessao.scalar(
@@ -79,4 +68,9 @@ class RepoLeituraLancamentoRecorrente(RepoLeituraBase[LancamentoRecorrente]):
                 LancamentoRecorrente.id == id,
                 LancamentoRecorrente.usuario_id == self.usuario.id,
             )
+        )
+
+    def buscar_por_id_sync(self, id: UUID) -> LancamentoRecorrente | None:
+        return self.sessao_sync.scalar(
+            select(LancamentoRecorrente).where(LancamentoRecorrente.id == id)
         )

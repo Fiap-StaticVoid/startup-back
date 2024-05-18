@@ -1,13 +1,15 @@
-from datetime import date
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel
+
+from contextos.historico.tabela import TipoFrequencia
 
 
 class HistoricoEntrada(BaseModel):
     valor: float
     categoria_id: UUID
-    data: date
+    data: datetime
 
 
 class HistoricoSaida(BaseModel):
@@ -15,4 +17,24 @@ class HistoricoSaida(BaseModel):
     valor: float
     usuario_id: UUID
     categoria_id: UUID
-    data: date
+    data: datetime
+
+
+class LancamentoRecorrenteEntrada(BaseModel):
+    valor: float
+    categoria_id: UUID
+    inicia_em: datetime
+    termina_em: datetime
+    frequencia: int
+    tipo_frequencia: TipoFrequencia
+
+
+class LancamentoRecorrenteSaida(BaseModel):
+    id: UUID
+    valor: float
+    usuario_id: UUID
+    categoria_id: UUID
+    inicia_em: datetime
+    termina_em: datetime
+    frequencia: int
+    tipo_frequencia: TipoFrequencia

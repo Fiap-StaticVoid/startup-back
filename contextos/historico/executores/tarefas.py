@@ -1,4 +1,5 @@
-from datetime import datetime
+import datetime
+from uuid import UUID
 
 from contextos.historico.repositorios.escrita import RepoEscritaHistorico
 from contextos.historico.repositorios.leitura import (
@@ -6,36 +7,28 @@ from contextos.historico.repositorios.leitura import (
     RepoLeituraLancamentoRecorrente,
 )
 from contextos.historico.tabela import Historico, LancamentoRecorrente
-from servidor.celery import celery_app
+from servidor.celery_config import celery_app
 
 
-def construir_todos_lancamentos_esperados(
-    lancamento: LancamentoRecorrente, agora: datetime
-) -> list[datetime]:
-    lancamentos: list[datetime] = []
-    if lancamento.termina_em and lancamento.termina_em < agora:
-        return lancamentos
-    lancamentos.append(lancamento.inicia_em)
-    while True:
-        proximo = lancamentos[-1] + lancamento.frequencia_timedelta
-        if lancamento.termina_em and proximo > lancamento.termina_em:
-            break
-        lancamentos.append(proximo)
-    return lancamentos
-
-
-def pegar_lancamento_mais_proximo(
-    lancamentos: list[datetime], agora: datetime
-) -> datetime:
-    for lancamento in lancamentos:
-        if lancamento > agora:
-            return lancamento
-    return lancamentos[-1]
+def adicionar_historico_lancamento(
+    repo_escrita_historico: RepoEscritaHistorico,
+    lancamento: LancamentoRecorrente,
+    momento: datetime.datetime,
+):
+    historico = Historico(
+        valor=lancamento.valor,
+        usuario_id=lancamento.usuario_id,
+        categoria_id=lancamento.categoria_id,
+        lancamento_id=lancamento.id,
+        data=momento,
+    )
+    repo_escrita_historico.adicionar_sync(historico, commit=False)
 
 
 @celery_app.task
-def rodar_lancamentos_recorrentes():
-    agora = datetime.now()
+def criar_historicos_do_lancamento(lancamento_id: UUID):
+    agora = datetime.datetime.now()
+
     with RepoLeituraLancamentoRecorrente() as repo_lancamento:
         repo_leitura_historico = RepoLeituraHistorico().definir_sessao_sync(
             repo_lancamento.sessao_sync
@@ -43,26 +36,39 @@ def rodar_lancamentos_recorrentes():
         repo_escrita_historico = RepoEscritaHistorico().definir_sessao_sync(
             repo_lancamento.sessao_sync
         )
+        lancamento = repo_lancamento.buscar_por_id_sync(lancamento_id)
+
+        if not lancamento:
+            return
+        if lancamento.inicia_em > agora or (
+            lancamento.termina_em and lancamento.termina_em < agora
+        ):
+            return
+
+        frequencia = lancamento.frequencia_timedelta
+        if historicos := list(
+            repo_leitura_historico.buscar_historicos_do_lancamento(lancamento_id)
+        ):
+            ultima_data = historicos[-1].data + frequencia
+        else:
+            adicionar_historico_lancamento(
+                repo_escrita_historico, lancamento, lancamento.inicia_em
+            )
+            ultima_data = lancamento.inicia_em + frequencia
+
+        while ultima_data < agora:
+            adicionar_historico_lancamento(
+                repo_escrita_historico, lancamento, ultima_data
+            )
+            ultima_data += frequencia
+
+        repo_escrita_historico.sessao_sync.commit()
+
+
+@celery_app.task
+def rodar_lancamentos_recorrentes():
+    agora = datetime.datetime.now()
+    with RepoLeituraLancamentoRecorrente() as repo_lancamento:
         lancamentos = repo_lancamento.listar_crawler(agora)
         for lancamento in lancamentos:
-            lancamentos_esperados = construir_todos_lancamentos_esperados(
-                lancamento, agora
-            )
-            if proximo_lancamento := pegar_lancamento_mais_proximo(
-                lancamentos_esperados, agora
-            ):
-                dados = {
-                    "valor": lancamento.valor,
-                    "usuario_id": lancamento.usuario_id,
-                    "categoria_id": lancamento.categoria_id,
-                    "data": proximo_lancamento,
-                }
-                historico = repo_leitura_historico.buscar_exato_crawler(**dados)
-                if historico:
-                    continue
-                repo_escrita_historico.adicionar_sync(
-                    Historico(**dados),
-                    commit=False,
-                )
-
-        repo_escrita_historico.sessao.commit()
+            criar_historicos_do_lancamento.delay(lancamento.id)

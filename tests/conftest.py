@@ -6,9 +6,6 @@ from pytest import fixture, mark
 from pytest_asyncio import fixture as asyncio_fixture
 from sqlalchemy.sql import text
 
-from banco.tabelas import Base
-from servidor.config import app
-
 pytestmark = mark.asyncio
 
 
@@ -22,17 +19,22 @@ def event_loop(request):
 
 @fixture(autouse=True, scope="session")
 async def criar_schema():
-    from banco import async_engine, async_session, carregar_tabelas
+    import banco
+    from banco import tabelas
 
-    async with async_session() as sessao:
+    async with banco.async_session() as sessao:
         await sessao.execute(text("DROP SCHEMA IF EXISTS testes CASCADE;"))
         await sessao.execute(text("CREATE SCHEMA IF NOT EXISTS testes;"))
         await sessao.commit()
-        carregar_tabelas()
-        async with async_engine.begin() as conn:
+        banco.carregar_tabelas()
+        async with banco.async_engine.begin() as conn:
             # muda o esquema para testes
             await conn.execute(text("SET search_path TO testes;"))
-            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(tabelas.Base.metadata.create_all)
+    with banco.session() as sessao:
+        with banco.engine.begin() as conn:
+            # muda o esquema para testes
+            conn.execute(text("SET search_path TO testes;"))
 
 
 @fixture(autouse=True)
@@ -46,25 +48,41 @@ async def mock_sessao(monkeypatch):
         PG_PORT = 5432
         PG_DATABASE = "postgres"
         PG_SCHEMA = "testes"
-        PG_URL = f"postgresql+{ASYNC_PG_ENGINE}://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DATABASE}?currentSchema={PG_SCHEMA}"
+
+        @property
+        def PG_ASYNC_URL(self):
+            return (
+                f"postgresql+{self.ASYNC_PG_ENGINE}://{self.PG_USER}:{self.PG_PASSWORD}@"
+                f"{self.PG_HOST}:{self.PG_PORT}/{self.PG_DATABASE}?currentSchema={self.PG_SCHEMA}"
+            )
+
+        @property
+        def PG_URL(self):
+            return (
+                f"postgresql+{self.PG_ENGINE}://{self.PG_USER}:{self.PG_PASSWORD}@"
+                f"{self.PG_HOST}:{self.PG_PORT}/{self.PG_DATABASE}?currentSchema={self.PG_SCHEMA}"
+            )
 
     monkeypatch.setattr("utilitarios.ambiente.ConfigsAmbiente", MockAmbiente)
 
 
 @fixture(autouse=True)
 async def limpar_banco():
-    from banco import async_engine, async_session
+    import banco
+    from banco import tabelas
 
-    async with async_session() as sessao:
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
+    async with banco.async_session() as sessao:
+        async with banco.async_engine.begin() as conn:
+            await conn.run_sync(tabelas.Base.metadata.drop_all)
+            await conn.run_sync(tabelas.Base.metadata.create_all)
         yield sessao
         await sessao.close()
 
 
 @fixture
 async def cliente():
+    from servidor.config import app
+
     @asynccontextmanager
     async def wrapper(token: str | None = None):
         headers = {}
@@ -82,5 +100,9 @@ from tests.contextos.categoria.mocks import mock_categoria  # noqa: F401, E402
 from tests.contextos.categoria.mocks import mock_custom_categoria  # noqa: F401, E402
 from tests.contextos.historico.mocks import mock_custom_historico  # noqa: F401, E402
 from tests.contextos.historico.mocks import mock_historico  # noqa: F401, E402
+from tests.contextos.historico.mocks import (  # noqa: F401, E402
+    mock_custom_lancamento_recorrente,
+    mock_lancamento_recorrente,
+)
 from tests.contextos.usuario.mocks import mock_custom_usuario  # noqa: F401, E402
 from tests.contextos.usuario.mocks import mock_usuario  # noqa: F401, E402
