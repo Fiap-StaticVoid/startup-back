@@ -1,3 +1,4 @@
+from secrets import token_urlsafe
 from typing import Optional
 
 from sqlalchemy.orm import Mapped
@@ -27,6 +28,9 @@ class Usuario(TabelaBase):
     @senha.setter
     def senha(self, senha: str) -> None:
         self._senha = gerar_senha(senha)
+
+    def gerar_token(self) -> None:
+        self.token = token_urlsafe(64)
 
     def verificar_senha(self, senha: str) -> bool:
         return verificar_senha(senha, self._senha)

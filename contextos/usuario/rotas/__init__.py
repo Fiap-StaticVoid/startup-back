@@ -28,6 +28,9 @@ async def login(dados: DadosLogin):
         usuario = await repo.buscar_por_email(dados.email)
         if usuario is None or not usuario.verificar_senha(dados.senha):
             raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        usuario.gerar_token()
+    async with RepoEscritaUsuario() as repo:
+        await repo.adicionar(usuario)
     return TokenSaida(token=usuario.token, tipo=TipoToken.bearer)
 
 
