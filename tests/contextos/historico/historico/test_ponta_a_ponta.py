@@ -17,6 +17,7 @@ async def test_criar_historico(
 ):
     historico = HistoricoEntrada(
         valor=100.0,
+        nome="Histórico Teste",
         categoria_id=mock_categoria.id,
         data=datetime.now(),
     )
@@ -39,6 +40,7 @@ async def test_ler_historicos(cliente: AsyncClient, mock_historico: Historico):
 async def test_atualizar_historico(cliente: AsyncClient, mock_historico: Historico):
     historico = HistoricoEntrada(
         valor=200.0,
+        nome=mock_historico.nome,
         categoria_id=mock_historico.categoria_id,
         data=datetime.now(),
     )

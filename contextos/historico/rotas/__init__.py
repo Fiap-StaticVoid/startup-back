@@ -26,7 +26,7 @@ async def criar_historico(historico: HistoricoEntrada, sessao: SessaoUsuario):
     ) as repo_categoria:
         categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
         if categoria is None:
-            raise HTTPException(status_code=404, detail="Categoria não encontrada")
+            raise HTTPException(status_code=404, detail="Histórico não encontrado")
         historico.categoria = categoria
         await repo_historico.adicionar(historico)
     return HistoricoSaida(**historico.model_dump())
@@ -57,9 +57,10 @@ async def atualizar_historico(
         ) as repo_categoria:
             categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
             if categoria is None:
-                raise HTTPException(status_code=404, detail="Categoria não encontrada")
+                raise HTTPException(status_code=404, detail="Histórico não encontrado")
             instancia_historico.categoria = categoria
     instancia_historico.valor = historico.valor
+    instancia_historico.nome = historico.nome
     instancia_historico.data = historico.data
     async with RepoEscritaHistorico(sessao.usuario).definir_sessao(
         sessao.sessao

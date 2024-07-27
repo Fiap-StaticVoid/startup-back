@@ -15,6 +15,7 @@ from contextos.usuario.tabela import Usuario
 async def mock_custom_historico(mock_usuario: Usuario, mock_categoria: Categoria):
     async def wrapper(
         valor: float = 100.0,
+        nome: str = "Histórico Teste",
         usuario: Usuario = mock_usuario,
         categoria: Categoria = mock_categoria,
         data: datetime = datetime.now(),
@@ -22,6 +23,7 @@ async def mock_custom_historico(mock_usuario: Usuario, mock_categoria: Categoria
         async with RepoEscritaHistorico(mock_usuario) as repo:
             historico = Historico(
                 valor=valor,
+                nome=nome,
                 usuario=usuario,
                 categoria=categoria,
                 data=data,
@@ -41,6 +43,7 @@ async def mock_custom_lancamento_recorrente(
 
     async def wrapper(
         valor: float = 100.0,
+        nome: str = "Lançamento Recorrente Teste",
         usuario: Usuario = mock_usuario,
         categoria: Categoria = mock_categoria,
         inicia_em: datetime = agora,
@@ -51,6 +54,7 @@ async def mock_custom_lancamento_recorrente(
         async with RepoEscritaLancamentoRecorrente(mock_usuario) as repo:
             lancamento_recorrente = LancamentoRecorrente(
                 valor=valor,
+                nome=nome,
                 usuario=usuario,
                 categoria=categoria,
                 inicia_em=inicia_em,

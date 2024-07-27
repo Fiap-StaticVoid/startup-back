@@ -24,6 +24,7 @@ class LancamentoRecorrente(TabelaBase):
     __tablename__ = "lancamentos_recorrentes"
 
     valor: Mapped[float]
+    nome: Mapped[Optional[str]]
 
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
@@ -58,6 +59,7 @@ class LancamentoRecorrente(TabelaBase):
     def model_dump(self) -> dict:
         return {
             "id": str(self.id),
+            "nome": self.nome,
             "valor": self.valor,
             "usuario_id": str(self.usuario_id),
             "categoria_id": str(self.categoria_id),
@@ -74,6 +76,8 @@ class Historico(TabelaBase):
     __tablename__ = "historicos"
 
     valor: Mapped[float]
+
+    nome: Mapped[Optional[str]]
 
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
@@ -93,6 +97,7 @@ class Historico(TabelaBase):
     def model_dump(self) -> dict:
         return {
             "id": str(self.id),
+            "nome": self.nome,
             "valor": self.valor,
             "usuario_id": str(self.usuario_id),
             "categoria_id": str(self.categoria_id),

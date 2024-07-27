@@ -36,7 +36,9 @@ async def criar_lancamento_recorrente(
             lancamento_recorrente_instancia.categoria_id
         )
         if categoria is None:
-            raise HTTPException(status_code=404, detail="Categoria não encontrada")
+            raise HTTPException(
+                status_code=404, detail="Lançamento Recorrente não encontrado"
+            )
         lancamento_recorrente_instancia.categoria = categoria
         await repo_lancamento_recorrente.adicionar(lancamento_recorrente_instancia)
 
@@ -87,9 +89,12 @@ async def atualizar_lancamento_recorrente(
                 lancamento_recorrente.categoria_id
             )
             if categoria is None:
-                raise HTTPException(status_code=404, detail="Categoria não encontrada")
+                raise HTTPException(
+                    status_code=404, detail="Lançamento Recorrente não encontrado"
+                )
             instancia_lancamento_recorrente.categoria = categoria
     instancia_lancamento_recorrente.valor = lancamento_recorrente.valor
+    instancia_lancamento_recorrente.nome = lancamento_recorrente.nome
     instancia_lancamento_recorrente.inicia_em = lancamento_recorrente.inicia_em
     instancia_lancamento_recorrente.termina_em = lancamento_recorrente.termina_em
     instancia_lancamento_recorrente.frequencia = lancamento_recorrente.frequencia
@@ -113,6 +118,8 @@ async def deletar_lancamento_recorrente(
     ) as repo:
         lancamento_recorrente = await repo.buscar_por_id(lancamento_recorrente_id)
         if lancamento_recorrente is None:
-            raise HTTPException(status_code=404, detail="Histórico não encontrado")
+            raise HTTPException(
+                status_code=404, detail="Lançamento Recorrente não encontrado"
+            )
         await repo.remover(lancamento_recorrente)
     return

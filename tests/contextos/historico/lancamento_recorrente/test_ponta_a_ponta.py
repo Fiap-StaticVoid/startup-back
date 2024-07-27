@@ -20,6 +20,7 @@ async def test_criar_lancamento_recorrente(
     uma_hora_depois = agora + datetime.timedelta(hours=1)
     lancamento_recorrente = LancamentoRecorrenteEntrada(
         valor=100.0,
+        nome="Lançamento Recorrente Teste",
         categoria_id=mock_categoria.id,
         inicia_em=agora,
         termina_em=uma_hora_depois,
@@ -52,6 +53,7 @@ async def test_atualizar_lancamento_recorrente(
     uma_hora_depois = agora + datetime.timedelta(hours=1)
     lancamento_recorrente = LancamentoRecorrenteEntrada(
         valor=200.0,
+        nome=mock_lancamento_recorrente.nome,
         categoria_id=mock_lancamento_recorrente.categoria_id,
         inicia_em=agora,
         termina_em=uma_hora_depois,
