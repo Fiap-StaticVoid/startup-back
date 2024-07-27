@@ -24,10 +24,13 @@ async def criar_historico(historico: HistoricoEntrada, sessao: SessaoUsuario):
     ) as repo_historico, RepoLeituraCategoria().definir_sessao(
         sessao.sessao
     ) as repo_categoria:
-        categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
-        if categoria is None:
-            raise HTTPException(status_code=404, detail="Histórico não encontrado")
-        historico.categoria = categoria
+        if historico.categoria_id is None:
+            historico.categoria = None
+        else:
+            categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
+            if categoria is None:
+                raise HTTPException(status_code=404, detail="Histórico não encontrado")
+            historico.categoria = categoria
         await repo_historico.adicionar(historico)
     return HistoricoSaida(**historico.model_dump())
 

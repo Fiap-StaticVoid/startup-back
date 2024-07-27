@@ -32,14 +32,17 @@ async def criar_lancamento_recorrente(
     ) as repo_lancamento_recorrente, RepoLeituraCategoria().definir_sessao(
         sessao.sessao
     ) as repo_categoria:
-        categoria = await repo_categoria.buscar_por_id(
-            lancamento_recorrente_instancia.categoria_id
-        )
-        if categoria is None:
-            raise HTTPException(
-                status_code=404, detail="Lançamento Recorrente não encontrado"
+        if lancamento_recorrente.categoria_id is None:
+            lancamento_recorrente_instancia.categoria = None
+        else:
+            categoria = await repo_categoria.buscar_por_id(
+                lancamento_recorrente_instancia.categoria_id
             )
-        lancamento_recorrente_instancia.categoria = categoria
+            if categoria is None:
+                raise HTTPException(
+                    status_code=404, detail="Lançamento Recorrente não encontrado"
+                )
+            lancamento_recorrente_instancia.categoria = categoria
         await repo_lancamento_recorrente.adicionar(lancamento_recorrente_instancia)
 
     criar_historicos_do_lancamento.delay(lancamento_recorrente_instancia.id)
@@ -85,14 +88,17 @@ async def atualizar_lancamento_recorrente(
         async with RepoLeituraCategoria().definir_sessao(
             sessao.sessao, True
         ) as repo_categoria:
-            categoria = await repo_categoria.buscar_por_id(
-                lancamento_recorrente.categoria_id
-            )
-            if categoria is None:
-                raise HTTPException(
-                    status_code=404, detail="Lançamento Recorrente não encontrado"
+            if lancamento_recorrente.categoria_id is None:
+                instancia_lancamento_recorrente.categoria = None
+            else:
+                categoria = await repo_categoria.buscar_por_id(
+                    lancamento_recorrente.categoria_id
                 )
-            instancia_lancamento_recorrente.categoria = categoria
+                if categoria is None:
+                    raise HTTPException(
+                        status_code=404, detail="Lançamento Recorrente não encontrado"
+                    )
+                instancia_lancamento_recorrente.categoria = categoria
     instancia_lancamento_recorrente.valor = lancamento_recorrente.valor
     instancia_lancamento_recorrente.nome = lancamento_recorrente.nome
     instancia_lancamento_recorrente.inicia_em = lancamento_recorrente.inicia_em
