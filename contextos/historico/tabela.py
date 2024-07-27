@@ -29,8 +29,10 @@ class LancamentoRecorrente(TabelaBase):
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
 
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
-    categoria: Mapped[Categoria] = relationship("Categoria", lazy="subquery")
+    categoria_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("categorias.id"), nullable=True
+    )
+    categoria: Mapped[Optional[Categoria]] = relationship("Categoria", lazy="subquery")
 
     inicia_em: Mapped[datetime] = mapped_column(default=datetime.today)
     termina_em: Mapped[Optional[datetime]] = mapped_column(default=None, nullable=True)
@@ -62,7 +64,7 @@ class LancamentoRecorrente(TabelaBase):
             "nome": self.nome,
             "valor": self.valor,
             "usuario_id": str(self.usuario_id),
-            "categoria_id": str(self.categoria_id),
+            "categoria_id": str(self.categoria_id) if self.categoria_id else None,
             "inicia_em": self.inicia_em.strftime("%Y-%m-%d"),
             "termina_em": (
                 self.termina_em.strftime("%Y-%m-%d") if self.termina_em else None
@@ -82,8 +84,10 @@ class Historico(TabelaBase):
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
 
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
-    categoria: Mapped[Categoria] = relationship("Categoria", lazy="subquery")
+    categoria_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("categorias.id"), nullable=True
+    )
+    categoria: Mapped[Optional[Categoria]] = relationship("Categoria", lazy="subquery")
 
     data: Mapped[datetime] = mapped_column(default=datetime.now)
 
@@ -100,6 +104,6 @@ class Historico(TabelaBase):
             "nome": self.nome,
             "valor": self.valor,
             "usuario_id": str(self.usuario_id),
-            "categoria_id": str(self.categoria_id),
+            "categoria_id": str(self.categoria_id) if self.categoria_id else None,
             "data": self.data.strftime("%Y-%m-%d"),
         }

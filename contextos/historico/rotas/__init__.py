@@ -55,10 +55,15 @@ async def atualizar_historico(
         async with RepoLeituraCategoria().definir_sessao(
             sessao.sessao, True
         ) as repo_categoria:
-            categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
-            if categoria is None:
-                raise HTTPException(status_code=404, detail="Histórico não encontrado")
-            instancia_historico.categoria = categoria
+            if historico.categoria_id is None:
+                instancia_historico.categoria = None
+            else:
+                categoria = await repo_categoria.buscar_por_id(historico.categoria_id)
+                if categoria is None:
+                    raise HTTPException(
+                        status_code=404, detail="Histórico não encontrado"
+                    )
+                instancia_historico.categoria = categoria
     instancia_historico.valor = historico.valor
     instancia_historico.nome = historico.nome
     instancia_historico.data = historico.data

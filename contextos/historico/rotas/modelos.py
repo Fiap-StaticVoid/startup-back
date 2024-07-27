@@ -10,7 +10,7 @@ from contextos.historico.tabela import TipoFrequencia
 class HistoricoEntrada(BaseModel):
     valor: float
     nome: Optional[str]
-    categoria_id: UUID
+    categoria_id: Optional[UUID]
     data: datetime
 
 
@@ -19,14 +19,14 @@ class HistoricoSaida(BaseModel):
     valor: float
     nome: Optional[str]
     usuario_id: UUID
-    categoria_id: UUID
+    categoria_id: Optional[UUID]
     data: datetime
 
 
 class LancamentoRecorrenteEntrada(BaseModel):
     valor: float
     nome: Optional[str]
-    categoria_id: UUID
+    categoria_id: Optional[UUID]
     inicia_em: datetime
     termina_em: Optional[datetime]
     frequencia: int
@@ -38,7 +38,7 @@ class LancamentoRecorrenteSaida(BaseModel):
     valor: float
     nome: Optional[str]
     usuario_id: UUID
-    categoria_id: UUID
+    categoria_id: Optional[UUID]
     inicia_em: datetime
     termina_em: Optional[datetime]
     frequencia: int
