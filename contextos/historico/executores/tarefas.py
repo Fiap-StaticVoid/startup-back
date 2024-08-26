@@ -17,10 +17,11 @@ def adicionar_historico_lancamento(
 ):
     historico = Historico(
         valor=lancamento.valor,
+        nome=lancamento.nome,
         usuario_id=lancamento.usuario_id,
         categoria_id=lancamento.categoria_id,
-        lancamento_id=lancamento.id,
         data=momento,
+        lancamento_id=lancamento.id,
     )
     repo_escrita_historico.adicionar_sync(historico, commit=False)
 
