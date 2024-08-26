@@ -21,6 +21,7 @@ class HistoricoSaida(BaseModel):
     usuario_id: UUID
     categoria_id: Optional[UUID]
     data: datetime
+    lancamento_id: Optional[UUID]
 
 
 class LancamentoRecorrenteEntrada(BaseModel):

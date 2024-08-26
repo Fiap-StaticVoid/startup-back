@@ -106,4 +106,5 @@ class Historico(TabelaBase):
             "usuario_id": str(self.usuario_id),
             "categoria_id": str(self.categoria_id) if self.categoria_id else None,
             "data": self.data.strftime("%Y-%m-%d"),
+            "lancamento_id": str(self.lancamento_id) if self.lancamento_id else None,
         }
