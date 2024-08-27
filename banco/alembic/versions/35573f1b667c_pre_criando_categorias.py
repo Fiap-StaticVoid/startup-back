@@ -25,6 +25,7 @@ categorias = [
     ("Salário", "Rendimentos com salário"),
     ("Saúde", "Despesas com saúde"),
     ("Transporte", "Despesas com transporte"),
+    ("Assinaturas", "Despesas com assinaturas"),
 ]
 
 
