@@ -12,8 +12,9 @@ class Usuario(TabelaBase):
     __tablename__ = "usuarios"
     __table_args__ = (
         UniqueConstraint("email"),
-        Index("idx_nome", "nome"),
-        Index("idx_email", "email"),
+        Index("idx_usuarios_nome", "nome"),
+        Index("idx_usuarios_email", "email"),
+        Index("idx_usuarios_token", "token"),
     )
 
     nome: Mapped[str]

@@ -13,6 +13,7 @@ async def test_criar_categoria(cliente: AsyncClient, mock_usuario: Usuario):
     categoria = CategoriaEntrada(
         nome="Categoria Teste",
         descricao="Descrição da categoria teste",
+        usuario_id=mock_usuario.id,
     )
     async with cliente(token=mock_usuario.token) as cliente:
         resposta = await cliente.post(
@@ -24,6 +25,8 @@ async def test_criar_categoria(cliente: AsyncClient, mock_usuario: Usuario):
         instancia_categoria = await repo.buscar_por_id(dados["id"])
         assert instancia_categoria is not None
         assert instancia_categoria.nome == categoria.nome
+        assert instancia_categoria.descricao == categoria.descricao
+        assert instancia_categoria.usuario_id == categoria.usuario_id
 
 
 async def test_ler_categorias(
@@ -41,6 +44,7 @@ async def test_atualizar_categoria(
     categoria = CategoriaEntrada(
         nome="Categoria Atualizada",
         descricao="Descrição da categoria atualizada",
+        usuario_id=mock_usuario.id,
     )
     async with cliente(token=mock_usuario.token) as cliente:
         resposta = await cliente.patch(
@@ -53,6 +57,8 @@ async def test_atualizar_categoria(
         instancia_categoria = await repo.buscar_por_id(dados["id"])
         assert instancia_categoria is not None
         assert instancia_categoria.nome == categoria.nome
+        assert instancia_categoria.descricao == categoria.descricao
+        assert instancia_categoria.usuario_id == categoria.usuario_id
 
 
 async def test_deletar_categoria(

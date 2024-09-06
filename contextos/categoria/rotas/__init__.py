@@ -17,7 +17,7 @@ rotas = APIRouter(
 
 @rotas.post("", response_model=CategoriaSaida, status_code=201)
 async def criar_categoria(categoria: CategoriaEntrada, sessao: SessaoUsuario):
-    categoria = Categoria(**categoria.model_dump())
+    categoria = Categoria(**categoria.model_dump(), usuario_id=sessao.usuario.id)
     async with RepoEscritaCategoria().definir_sessao(sessao.sessao) as repo:
         await repo.adicionar(categoria)
     return CategoriaSaida(**categoria.model_dump())
@@ -26,7 +26,7 @@ async def criar_categoria(categoria: CategoriaEntrada, sessao: SessaoUsuario):
 @rotas.get("", response_model=list[CategoriaSaida], status_code=200)
 async def listar_categorias(sessao: SessaoUsuario):
     async with RepoLeituraCategoria().definir_sessao(sessao.sessao) as repo:
-        categorias = await repo.listar()
+        categorias = await repo.buscar_do_usuario(sessao.usuario.id)
     return list(map(lambda h: CategoriaSaida(**h.model_dump()), categorias))
 
 

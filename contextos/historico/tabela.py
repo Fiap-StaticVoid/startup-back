@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import Optional
+from uuid import UUID
 
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.schema import ForeignKey, Index
 
 from banco.tabelas import TabelaBase
 from contextos.categoria.tabela import Categoria
@@ -22,14 +23,23 @@ class TipoFrequencia(StrEnum):
 
 class LancamentoRecorrente(TabelaBase):
     __tablename__ = "lancamentos_recorrentes"
+    __table_args__ = (
+        Index(
+            "idx_lancamentos_recorrentes_inicia_em_termina_em",
+            "inicia_em",
+            "termina_em",
+        ),
+        Index("idx_lancamentos_recorrentes_usuario_id", "usuario_id"),
+        Index("idx_lancamentos_recorrentes_id_usuario_id", "id", "usuario_id"),
+    )
 
     valor: Mapped[float]
     nome: Mapped[Optional[str]]
 
-    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
+    usuario_id: Mapped[UUID] = mapped_column(ForeignKey("usuarios.id"))
     usuario: Mapped[Usuario] = relationship("Usuario", lazy="subquery")
 
-    categoria_id: Mapped[Optional[int]] = mapped_column(
+    categoria_id: Mapped[Optional[UUID]] = mapped_column(
         ForeignKey("categorias.id"), nullable=True
     )
     categoria: Mapped[Optional[Categoria]] = relationship("Categoria", lazy="subquery")
@@ -76,6 +86,11 @@ class LancamentoRecorrente(TabelaBase):
 
 class Historico(TabelaBase):
     __tablename__ = "historicos"
+    __table_args__ = (
+        Index("idx_historicos_usuario_id", "usuario_id"),
+        Index("idx_historicos_id_usuario_id", "id", "usuario_id"),
+        Index("idx_historicos_lancamento_id", "lancamento_id"),
+    )
 
     valor: Mapped[float]
 

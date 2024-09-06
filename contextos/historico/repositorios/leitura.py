@@ -46,8 +46,10 @@ class RepoLeituraLancamentoRecorrente(RepoLeituraBase[LancamentoRecorrente]):
     def listar_crawler(self, momento: datetime) -> list[LancamentoRecorrente]:
         return self.sessao_sync.scalars(
             select(LancamentoRecorrente)
-            .where(LancamentoRecorrente.inicia_em <= momento)
-            .where(LancamentoRecorrente.termina_em >= momento)
+            .where(
+                LancamentoRecorrente.inicia_em <= momento,
+                LancamentoRecorrente.termina_em >= momento,
+            )
             .order_by(LancamentoRecorrente.inicia_em)
         )
 
