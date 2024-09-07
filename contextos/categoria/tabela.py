@@ -32,5 +32,5 @@ class Categoria(TabelaBase):
             "id": str(self.id),
             "nome": self.nome,
             "descricao": self.descricao,
-            "usuario_id": str(self.usuario_id),
+            "usuario_id": str(self.usuario_id) if self.usuario_id else None,
         }
