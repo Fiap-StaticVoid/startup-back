@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from contextos.usuario.repositorios.escrita import RepoEscritaUsuario
 from contextos.usuario.repositorios.leitura import RepoLeituraUsuario
+from contextos.usuario.rotas.erros import SenhaNaoValida
 from contextos.usuario.rotas.modelos import (
     DadosLogin,
     TipoToken,
@@ -14,6 +15,7 @@ from contextos.usuario.rotas.modelos import (
 )
 from contextos.usuario.tabela import Usuario
 from utilitarios.rotas import SessaoUsuario
+from utilitarios.senhas import CheckSenhaForte
 
 rotas = APIRouter(
     prefix="/usuarios",
@@ -44,6 +46,9 @@ async def logout(sessao: SessaoUsuario):
 
 @rotas.post("", response_model=UsuarioSaida, status_code=201)
 async def criar_usuario(usuario: UsuarioEntrada):
+    senha_eh_forte, falhas = CheckSenhaForte.senha_eh_forte(usuario.senha)
+    if not senha_eh_forte:
+        raise SenhaNaoValida(falhas)
     usuario = Usuario(**usuario.model_dump())
     async with RepoEscritaUsuario() as repo:
         await repo.adicionar(usuario)
@@ -68,6 +73,9 @@ async def atualizar_usuario(
     instancia_usuario.nome = usuario.nome
     instancia_usuario.email = usuario.email
     if usuario.senha:
+        senha_eh_forte, falhas = CheckSenhaForte.senha_eh_forte(usuario.senha)
+        if not senha_eh_forte:
+            raise SenhaNaoValida(falhas)
         instancia_usuario.senha = usuario.senha
     async with RepoEscritaUsuario().definir_sessao(sessao.sessao) as repo_escrita:
         await repo_escrita.adicionar(instancia_usuario)

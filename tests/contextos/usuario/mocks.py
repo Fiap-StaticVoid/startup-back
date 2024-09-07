@@ -9,7 +9,7 @@ async def mock_custom_usuario():
     async def wrapper(
         nome: str = "Usuário Teste",
         email: str = "teste@teste.com.br",
-        senha: str = "senha",
+        senha: str = "senha_Forte123",
     ) -> Usuario:
         async with RepoEscritaUsuario() as repo:
             usuario = Usuario(nome=nome, email=email, senha=senha, token="teste")

@@ -12,7 +12,7 @@ async def test_criar_usuario(cliente: AsyncClient):
     usuario = UsuarioEntrada(
         nome="Usuário Teste",
         email="teste@teste.com.br",
-        senha="senha",
+        senha="senha_Forte123",
     )
     async with cliente() as cliente:
         resposta = await cliente.post("/api/usuarios", json=usuario.model_dump())
