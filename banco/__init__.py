@@ -31,14 +31,3 @@ def carregar_tabelas():
     from contextos.categoria.tabela import Categoria  # noqa: F401
     from contextos.historico.tabela import Historico, LancamentoRecorrente  # noqa: F401
     from contextos.usuario.tabela import Usuario  # noqa: F401
-
-
-async def iniciar_banco():
-    if env.PG_SCHEMA == "teste":
-        return
-    from banco.tabelas import Base
-
-    carregar_tabelas()
-
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)

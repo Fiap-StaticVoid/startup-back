@@ -1,5 +1,3 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -11,16 +9,7 @@ from contextos.historico.rotas.lancamento_recorrente import (
 )
 from contextos.usuario.rotas import rotas as usuario_rotas
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    from banco import iniciar_banco
-
-    await iniciar_banco()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 origens = ["*"]
 
 app.add_middleware(
