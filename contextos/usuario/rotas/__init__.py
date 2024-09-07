@@ -44,7 +44,25 @@ async def logout(sessao: SessaoUsuario):
     return
 
 
-@rotas.post("", response_model=UsuarioSaida, status_code=201)
+@rotas.post(
+    "",
+    responses={
+        406: {
+            "description": "Senha não atende aos requisitos",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": {
+                            "falhas": ["falha x", "falha y"],
+                        }
+                    }
+                }
+            },
+        }
+    },
+    response_model=UsuarioSaida,
+    status_code=201,
+)
 async def criar_usuario(usuario: UsuarioEntrada):
     senha_eh_forte, falhas = CheckSenhaForte.senha_eh_forte(usuario.senha)
     if not senha_eh_forte:
