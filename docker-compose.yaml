@@ -12,13 +12,21 @@ services:
         command: sh -c "alembic upgrade head && gunicorn servidor.config:app --workers=1 --worker-class=uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --access-logfile=-"
     db:
         container_name: db_postgres
-        image: postgres:16.2-alpine
+        image: postgres:16.4-alpine
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: postgres
         ports:
             - 5432:5432
+        command:
+            [
+                "postgres",
+                "-c",
+                "log_statement=all",
+                "-c",
+                "log_destination=stderr",
+            ]
     pgadmin:
         container_name: pg_admin
         image: dpage/pgadmin4:latest
