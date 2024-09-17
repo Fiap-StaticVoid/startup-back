@@ -4,7 +4,7 @@ from bcrypt import checkpw, gensalt, hashpw
 class CheckSenhaForte:
     @staticmethod
     def possui_no_minimo_8_caracteres(senha: str) -> str | None:
-        return None if len(senha) > 8 else "Precisa ter no mínimo 8 caracteres"
+        return None if len(senha) >= 8 else "Precisa ter no mínimo 8 caracteres"
 
     @staticmethod
     def possui_letras_minusculas(senha: str) -> str | None:
